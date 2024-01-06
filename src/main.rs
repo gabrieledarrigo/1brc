@@ -38,6 +38,15 @@ fn read_measurement_file() -> Option<impl BufRead> {
     }
 }
 
+fn parse_line(line: &str) -> Option<(String, f32)> {
+    line.split_once(";").and_then(|(station, measurement_str)| {
+        measurement_str
+            .parse::<f32>()
+            .ok()
+            .map(|measurement| (station.to_string(), measurement))
+    })
+}
+
 fn main() {
     let buffer = read_measurement_file().unwrap_or_else(|| {
         println!("Cannot open {}", MEASUREMENT_FILE);
@@ -53,11 +62,35 @@ fn main() {
             exit(1);
         });
 
-        let (station, measurement): (&str, &str) = line.split_once(";").unwrap_or_else(|| {
+        let (station, measurement) = parse_line(&line).unwrap_or_else(|| {
             println!("Line in the wrong format, cannot split by ;");
             exit(1);
         });
 
-        calculate_average(station, measurement.parse::<f32>().unwrap());
+        calculate_average(&station, measurement);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::parse_line;
+
+    #[test]
+    fn test_parse_line() {
+        let line = "Milan;13.0";
+
+        let (station, measurement) = parse_line(line).unwrap();
+
+        assert_eq!(station, "Milan");
+        assert_eq!(measurement, 13.0);
+    }
+
+    #[test]
+    fn test_parse_line_returns_none() {
+        let line = "Milan 13.0";
+
+        let actual = parse_line(line);
+
+        assert!(actual.is_none());
     }
 }
