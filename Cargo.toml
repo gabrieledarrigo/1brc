@@ -9,3 +9,7 @@ edition = "2021"
 approx = "0.5.1"
 rand = "0.8.5"
 rand_distr = "0.4.3"
+
+[[bin]]
+name = "create-measurements"
+path = "src/create_measurements/bin/main.rs"
