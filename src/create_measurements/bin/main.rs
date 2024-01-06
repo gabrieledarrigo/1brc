@@ -7,14 +7,11 @@ use create_measurements::*;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    println!("{:?}", args);
 
     if args.len() != 2 {
         println!("Usage: create_measurements <number of records to create>");
         exit(1);
     }
-
-    println!("{:?}", args);
 
     let number_of_measurements = args[1].parse::<i32>().unwrap_or_else(|_| {
         println!("The value provided is not a valid number");

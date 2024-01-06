@@ -10,7 +10,7 @@ use crate::weather_station::WeatherStation;
 
 const MEASUREMENT_FILE: &str = "./measurements.txt";
 
-fn stations() -> Vec<WeatherStation> {
+fn get_stations() -> Vec<WeatherStation> {
     vec![
         WeatherStation::new(String::from("Abha"), 18.0),
         WeatherStation::new(String::from("Abidjan"), 26.0),
@@ -428,6 +428,22 @@ fn stations() -> Vec<WeatherStation> {
     ]
 }
 
+/// Creates a specified number of weather measurements and writes them to a file.
+///
+/// # Arguments
+///
+/// * `number_of_measurements` - The total number of measurements to generate.
+///
+/// # Panics
+///
+/// Panics if it fails to create or write to the measurement file.
+///
+/// # Examples
+///
+/// ```
+/// // Generate and write 100 measurements to the default file.
+/// create_measurements(100);
+/// ```
 pub fn create_measurements(number_of_measurements: i32) {
     let start = Instant::now();
 
@@ -437,7 +453,7 @@ pub fn create_measurements(number_of_measurements: i32) {
     );
 
     let mut rng = rand::thread_rng();
-    let stations = stations();
+    let stations = get_stations();
 
     let file = File::create(MEASUREMENT_FILE).expect("Cannot create file");
     let mut buffer = BufWriter::new(file);
