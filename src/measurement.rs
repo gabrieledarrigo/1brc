@@ -9,7 +9,9 @@ impl Display for Stations {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(formatter, "{{")?;
 
-        for (station, measurement) in &self.data {
+        let sorted: Vec<(String, Measurement)> = self.to_sorted_vector();
+
+        for (station, measurement) in sorted {
             write!(formatter, "{}={},", station, measurement)?;
         }
 
@@ -25,10 +27,6 @@ impl Stations {
         }
     }
 
-    pub fn data(&self) -> &HashMap<String, Measurement> {
-        &self.data
-    }
-
     pub fn add_measurement(&mut self, station: &str, measurement: f32) {
         let current = &mut self
             .data
@@ -37,9 +35,16 @@ impl Stations {
 
         current.update(measurement);
     }
+
+    fn to_sorted_vector(&self) -> Vec<(String, Measurement)> {
+        let mut vec: Vec<(String, Measurement)> = self.data.clone().into_iter().collect();
+        vec.sort_by(|(a, _), (b, _)| a.cmp(b));
+
+        vec
+    }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Measurement {
     min: f32,
     max: f32,
@@ -110,10 +115,11 @@ mod tests {
     #[test]
     fn test_display_stations() {
         let mut stations = Stations::new();
-        stations.add_measurement("Milan", 10.0);
-        stations.add_measurement("Rome", 20.0);
+        stations.add_measurement("Milano", 10.0);
+        stations.add_measurement("Roma", 20.0);
+        stations.add_measurement("Ancona", 25.0);
 
-        let expected_output = "{Milan=10.0/10.0/10.0,Rome=20.0/20.0/20.0,}";
+        let expected_output = "{Ancona=25.0/25.0/25.0,Milano=10.0/10.0/10.0,Roma=20.0/20.0/20.0,}";
 
         assert_eq!(stations.to_string(), expected_output);
     }
