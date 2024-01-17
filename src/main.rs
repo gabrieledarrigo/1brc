@@ -22,12 +22,12 @@ fn read_measurement_file() -> Option<impl BufRead> {
 
 /// Parses a line of measurement data and returns a tuple of station name and measurement value.
 /// Returns `None` if the line is in the wrong format.
-fn parse_line(line: &str) -> Option<(String, f32)> {
+fn parse_line(line: &str) -> Option<(&str, f32)> {
     line.split_once(";").and_then(|(station, measurement_str)| {
         measurement_str
             .parse::<f32>()
             .ok()
-            .map(|measurement| (station.to_string(), measurement))
+            .map(|measurement| (station, measurement))
     })
 }
 
@@ -65,18 +65,9 @@ mod tests {
 
     #[test]
     fn test_parse_line() {
-        assert_eq!(
-            parse_line("Bulawayo;8.9"),
-            Some(("Bulawayo".to_string(), 8.9))
-        );
-        assert_eq!(
-            parse_line("St. John's;15.2"),
-            Some(("St. John's".to_string(), 15.2))
-        );
-        assert_eq!(
-            parse_line("Istanbul;6.2"),
-            Some(("Istanbul".to_string(), 6.2))
-        );
+        assert_eq!(parse_line("Bulawayo;8.9"), Some(("Bulawayo", 8.9)));
+        assert_eq!(parse_line("St. John's;15.2"), Some(("St. John's", 15.2)));
+        assert_eq!(parse_line("Istanbul;6.2"), Some(("Istanbul", 6.2)));
         assert_eq!(parse_line("Invalid Line"), None);
     }
 }
